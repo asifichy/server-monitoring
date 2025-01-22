@@ -6,7 +6,7 @@
     "prom-client": "^12.0.0"
   },
   "description": "Monitoring servers with Grafana, Prometheus, Loki",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
