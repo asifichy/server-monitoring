@@ -1,6 +1,7 @@
 const express = require('express');
 const client = require('prom-client'); //metric collection
 const responseTime = require('response-time');
+const { createLogger, transports } = require("winston");
 const { doSomeHeavyTask } = require('./util');
 
 const app = express();
@@ -11,11 +12,13 @@ const collectionDefualtMetrics = client.collectDefaultMetrics;
 collectionDefualtMetrics({ register: client.register });
 
 app.get("/", (req, res) => {
+  logger.info('Req came to / route');
   return res.json({ message: `Hello World` });
 });
 
 app.get("/slow", async (req, res) => {
   try {
+    logger.info('Req came to / slow route');
     const timeTaken = await doSomeHeavyTask();
     return res.json({
       status: "Success",
@@ -58,3 +61,13 @@ app.listen(PORT, () => {
   console.log(`Express Server is running at http://localhost:${PORT}`);
 });
 
+//winston logger
+const LokiTransport = require("winston-loki");
+const options = {
+  transports: [
+    new LokiTransport({
+      host: "http://127.0.0.1:3100"
+    })
+  ]
+};
+const logger = createLogger(options);
