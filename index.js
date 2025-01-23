@@ -11,6 +11,18 @@ const collectionDefualtMetrics = client.collectDefaultMetrics;
 
 collectionDefualtMetrics({ register: client.register });
 
+
+//winston logger
+const LokiTransport = require("winston-loki");
+const options = {
+  transports: [
+    new LokiTransport({
+      host: "http://127.0.0.1:3100"
+    })
+  ]
+};
+const logger = createLogger(options);
+
 app.get("/", (req, res) => {
   logger.info('Req came to / route');
   return res.json({ message: `Hello World` });
@@ -25,7 +37,8 @@ app.get("/slow", async (req, res) => {
       message: `Heavy task completed in ${timeTaken}ms`
     });
   }
-  catch (err) {
+  catch (error) {
+    logger.error(error.message);
     return res.status(500).json({
       status: "Failed",
       error: "Internal Server Error",
@@ -61,13 +74,3 @@ app.listen(PORT, () => {
   console.log(`Express Server is running at http://localhost:${PORT}`);
 });
 
-//winston logger
-const LokiTransport = require("winston-loki");
-const options = {
-  transports: [
-    new LokiTransport({
-      host: "http://127.0.0.1:3100"
-    })
-  ]
-};
-const logger = createLogger(options);
